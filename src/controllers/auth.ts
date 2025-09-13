@@ -43,7 +43,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, username, password } = req.body;
@@ -78,6 +77,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     next(err);
   }
 };
+
 export const me = async (req : Request, res : Response) =>{
-    res.json(req.user)
+    res.json(req.user)  
 }

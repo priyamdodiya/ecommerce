@@ -30,7 +30,7 @@ export const createOrder = async (req: Request, res: Response) => {
       data: {
         userId: req.user!.id,
         netAmount: price,
-        address: address?.formattedAddress ?? "", // fix: Prisma expects string
+        address: address?.formattedAddress ?? "",
         products: {
           create: cartItems.map((cart) => ({
             productId: cart.productId,
@@ -120,7 +120,6 @@ export const listAllOrders = async (req: Request, res: Response) => {
 }
 
 export const changeStatus = async (req: Request, res: Response) => {
-  //wrap it inside transaction
   try {
     const order = await prisma.order.update({
       where: {
