@@ -89,12 +89,12 @@ model Order {
   userId Int
   user User @relation(fields : [userId], references: [id])
   netAmount Decimal
+  quantity Int @default(1)
   address String
   status OrderEventStatus @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   products OrderProduct[]
-  events OrderEvent[]
   @@map("orders")
 }
 
@@ -112,13 +112,13 @@ model OrderProduct {
   @@map("orders_products")
 }
 
-model OrderEvent {
-  id Int @id @default(autoincrement())
-  orderId Int
-  order Order @relation(fields : [orderId], references: [id])
-  status OrderEventStatus @default(PENDING)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// model OrderEvent {
+//   id Int @id @default(autoincrement())
+//   orderId Int
+//   order Order @relation(fields : [orderId], references: [id])
+//   status OrderEventStatus @default(PENDING)
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
 
-  @@map("order_events")
-}
+//   @@map("order_events")
+// }

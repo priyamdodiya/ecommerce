@@ -18,7 +18,9 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
           currency: "inr",
           product_data: {
             name: item.product?.name || item.name,
-            images: item.product?.image ? [`${process.env.BACKEND_URL}${item.product.image}`] : [],
+            images: item.product?.image
+  ? [`${process.env.IMAGE_CDN_URL}${item.product.image}`]
+  : [],
           },
           unit_amount: Math.round(Number(item.price) * 100),
         },
