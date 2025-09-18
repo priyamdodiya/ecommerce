@@ -102,6 +102,11 @@ dotenv.config();
 const app: Express = express();
 const PORT = 3001;
 
+app.get("/", (req, res) => {
+  res.send("✅ Backend is running on Render!");
+});
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
