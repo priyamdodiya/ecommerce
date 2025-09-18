@@ -2,20 +2,15 @@ import { Request, Response } from "express";
 import { stripe } from "../config/stripe";
 import { UnauthorizedException } from "../exceptions/unauthorized";
 import { ErrorCode } from "../exceptions/root";
-
 export const createCheckoutSession = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
       throw new UnauthorizedException("User not authenticated", ErrorCode.UNAUTHORIZED);
     }
-
     const { cartItems, orderSummary } = req.body;
-    console.log("orderSummary::: ", orderSummary);
-
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
       return res.status(400).json({ message: "Cart items are required" });
     }
-
     let coupon;
     if (orderSummary.discount > 0) {
       coupon = await stripe.coupons.create({
@@ -26,7 +21,6 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     }
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-
       line_items: cartItems.map((item: any) => ({
         price_data: {
           currency: "inr",
@@ -40,20 +34,35 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
         },
         quantity: item.quantity,
       })),
-
       mode: "payment",
       success_url: `${process.env.FRONTEND_URL}/success`,
       cancel_url: `${process.env.FRONTEND_URL}/cart`,
       customer_email: req.user.email,
-
       discounts: coupon ? [{ coupon: coupon.id }] : [],
-
       metadata: {
         userId: req.user.id.toString(),
       },
     });
-
     return res.json({ id: session.id, url: session.url });
+  } catch (error: any) {
+    console.error("Stripe Error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const getCheckoutSession = async (req: Request, res: Response) => {
+  try {
+    const { sessionId } = req.params;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: "Session ID is required" });
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["payment_intent", "line_items"],
+    });
+
+    return res.json(session);
   } catch (error: any) {
     console.error("Stripe Error:", error);
     return res.status(500).json({ error: error.message });

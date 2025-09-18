@@ -16,7 +16,6 @@ export const errorHandler = (method: Function) => {
           exception = new BadRequestsException("Unprocessable entity..!", ErrorCode.UNPROCESSABLEENTITY)
         } else {
           exception = new InternalException("Something went wrong", error, ErrorCode.INTERNAL_EXCEPTION)
-
         }
       }
       next(exception)

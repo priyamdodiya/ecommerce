@@ -40,9 +40,9 @@ export const createOrder = async (req: Request, res: Response) => {
       },
     });
 
-    await tx.orderEvent.create({
-      data: { orderId: order.id, status: "PENDING" },
-    });
+    // await tx.orderEvent.create({
+    //   data: { orderId: order.id, status: "PENDING" },
+    // });
 
     await tx.cartItem.deleteMany({
       where: { userId: req.user!.id },
@@ -73,9 +73,9 @@ export const cancelOrder = async (req: Request, res: Response) => {
         data: { status: "CANCELLED" },
       });
 
-      await tx.orderEvent.create({
-        data: { orderId: updatedOrder.id, status: "CANCELLED" },
-      });
+      // await tx.orderEvent.create({
+      //   data: { orderId: updatedOrder.id, status: "CANCELLED" },
+      // });
 
       return updatedOrder;
     });
@@ -91,7 +91,8 @@ export const getOrderById = async (req: Request, res: Response) => {
   try {
     const order = await prisma.order.findFirstOrThrow({
       where: { id: +req.params.id },
-      include: { products: true, events: true },
+      include: { products: true},
+      // events: true 
     });
 
     res.json(order);
@@ -129,12 +130,12 @@ export const changeStatus = async (req: Request, res: Response) => {
         status : req.body.status
       }
     });
-    await prisma.orderEvent.create({
-      data : {
-        orderId : order.id,
-        status : req.body.status
-      }
-    })
+    // await prisma.orderEvent.create({
+    //   data : {
+    //     orderId : order.id,
+    //     status : req.body.status
+    //   }
+    // })
     res.json(order);
   } catch (error) {
     throw new NotFoundException("Order not found.", ErrorCode.ORDER_NOT_FOUND);

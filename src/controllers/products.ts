@@ -7,10 +7,10 @@ export const createProduct = async (req: Request, res: Response) => {
   console.log("req.body:", req.body);
   console.log("req.file:", req.file);
   try {
-    const { name, description, price,discountPrice, stock } = req.body;
-    if (!name || !description || !price) {
+    const { name, description, price,discountPrice, stock, category } = req.body;
+    if (!name || !description || !price || !category) {
       return res.status(400).json({
-        message: "Product name, description, and price are required",
+        message: "Product name, description, and price and category are required",
       });
     }
     const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
@@ -22,6 +22,7 @@ export const createProduct = async (req: Request, res: Response) => {
         discountPrice: discountPrice ? Number(discountPrice) : null,
         stock: stock ? Number(stock) : 0,
         image: imagePath,
+        category,
         isAvailable: stock && Number(stock) > 0 ? true : false,
       },
     });
@@ -34,24 +35,39 @@ export const createProduct = async (req: Request, res: Response) => {
     });
   }
 }
-
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    const product = req.body;
-    if (product.tags) {
-      product.tags = product.tags.join(",")
-    }
-    const updateProduct = await prisma.product.update({
-      where: {
-        id: +req.params.id
-      },
-      data: product
-    })
-    res.json(updateProduct)
-  } catch {
-    throw new NotFoundException("product not found", ErrorCode.PRODUCT_NOT_FOUND)
+    const { name, description, price, discountPrice, stock, category, isAvailable } = req.body;
+
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+    const data: any = {};
+
+    if (name) data.name = name;
+    if (description) data.description = description;
+    if (price) data.price = Number(price);
+    if (discountPrice) data.discountPrice = Number(discountPrice);
+    if (stock) data.stock = Number(stock);
+    if (category) data.category = category;
+    if (typeof isAvailable !== "undefined") data.isAvailable = isAvailable === "true";
+    if (imagePath) data.image = imagePath;
+
+    const updatedProduct = await prisma.product.update({
+      where: { id: +req.params.id },
+      data,
+    });
+
+    res.json(updatedProduct);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({
+      message: "Something went wrong while updating product",
+      error: error.message,
+    });
   }
-}
+};
+
+
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
@@ -71,8 +87,10 @@ export const deleteProduct = async (req: Request, res: Response) => {
 
 export const listProducts = async (req: Request, res: Response) => {
   try {
-    const products = await prisma.product.findMany();
-    const total = await prisma.product.count();
+    const {category} = req.query;
+    const whereClause : any = category ? {category : String(category)} : {}
+    const products = await prisma.product.findMany({where : whereClause});
+    const total = await prisma.product.count({where : whereClause});
 
     res.json({
       total,
