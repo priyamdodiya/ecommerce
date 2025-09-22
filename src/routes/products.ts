@@ -7,7 +7,6 @@ import { upload } from "../middlewares/upload.ts";
 const productsRoutes : Router = Router();
 
 productsRoutes.post("/",upload.single("image"),errorHandler(createProduct));
-// productsRoutes.put("/:id",[authMiddleware,adminMiddleware],errorHandler(updateProduct));
 productsRoutes.put("/:id",[authMiddleware, adminMiddleware, upload.single("image")],errorHandler(updateProduct));
 
 productsRoutes.delete("/:id",[authMiddleware,adminMiddleware],errorHandler(deleteProduct));

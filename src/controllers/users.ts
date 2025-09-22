@@ -98,7 +98,6 @@ export const updateUser = async(req : Request,res : Response) =>{
 
 export const listUsers = async(req : Request,res : Response)=>{
     const users = await prisma.user.findMany({
-        // skip : +req.query.skip || 0,
         skip : Number(req.query.skip ?? 0),
         take : 5
     })

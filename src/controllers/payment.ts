@@ -4,6 +4,8 @@ import { UnauthorizedException } from "../exceptions/unauthorized";
 import { ErrorCode } from "../exceptions/root";
 export const createCheckoutSession = async (req: Request, res: Response) => {
   try {
+    console.log("Request", req.body);
+    console.log("User", req.user);
     if (!req.user) {
       throw new UnauthorizedException("User not authenticated", ErrorCode.UNAUTHORIZED);
     }
@@ -11,6 +13,8 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
       return res.status(400).json({ message: "Cart items are required" });
     }
+    console.log("Cart items:", cartItems);
+    console.log("Order summary:", orderSummary);
     let coupon;
     if (orderSummary.discount > 0) {
       coupon = await stripe.coupons.create({
@@ -18,6 +22,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
         currency: "inr",
         duration: "once",
       });
+      console.log("Created coupon:", coupon);
     }
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -43,6 +48,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
         userId: req.user.id.toString(),
       },
     });
+    console.log("Stripe session created:", session.id);
     return res.json({ id: session.id, url: session.url });
   } catch (error: any) {
     console.error("Stripe Error:", error);
@@ -52,6 +58,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
 
 export const getCheckoutSession = async (req: Request, res: Response) => {
   try {
+    console.log("Session ID:", req.params.sessionId);
     const { sessionId } = req.params;
 
     if (!sessionId) {
@@ -61,7 +68,7 @@ export const getCheckoutSession = async (req: Request, res: Response) => {
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ["payment_intent", "line_items"],
     });
-
+    console.log("Retrieved session:", session.id);
     return res.json(session);
   } catch (error: any) {
     console.error("Stripe Error:", error);

@@ -67,8 +67,6 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 };
 
-
-
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const deleteProduct = await prisma.product.delete({
@@ -84,7 +82,6 @@ export const deleteProduct = async (req: Request, res: Response) => {
     throw new NotFoundException("product not found", ErrorCode.PRODUCT_NOT_FOUND)
   }
 }
-
 export const listProducts = async (req: Request, res: Response) => {
   try {
     const {category} = req.query;
@@ -104,8 +101,6 @@ export const listProducts = async (req: Request, res: Response) => {
     });
   }
 };
-
-
 
 export const getProductById = async (req: Request, res: Response) => {
   try {

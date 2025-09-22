@@ -40,10 +40,6 @@ export const createOrder = async (req: Request, res: Response) => {
       },
     });
 
-    // await tx.orderEvent.create({
-    //   data: { orderId: order.id, status: "PENDING" },
-    // });
-
     await tx.cartItem.deleteMany({
       where: { userId: req.user!.id },
     });
@@ -73,10 +69,6 @@ export const cancelOrder = async (req: Request, res: Response) => {
         data: { status: "CANCELLED" },
       });
 
-      // await tx.orderEvent.create({
-      //   data: { orderId: updatedOrder.id, status: "CANCELLED" },
-      // });
-
       return updatedOrder;
     });
 
@@ -91,8 +83,7 @@ export const getOrderById = async (req: Request, res: Response) => {
   try {
     const order = await prisma.order.findFirstOrThrow({
       where: { id: +req.params.id },
-      include: { products: true},
-      // events: true 
+      include: { products: true },
     });
 
     res.json(order);
@@ -126,28 +117,21 @@ export const changeStatus = async (req: Request, res: Response) => {
       where: {
         id: +req.params.id
       },
-      data : {
-        status : req.body.status
+      data: {
+        status: req.body.status
       }
     });
-    // await prisma.orderEvent.create({
-    //   data : {
-    //     orderId : order.id,
-    //     status : req.body.status
-    //   }
-    // })
+
     res.json(order);
   } catch (error) {
     throw new NotFoundException("Order not found.", ErrorCode.ORDER_NOT_FOUND);
   }
 }
 
-
-
 export const listUserOrders = async (req: Request, res: Response) => {
-    let whereClause : any = {
-      userId : +req.params.id
-    }
+  let whereClause: any = {
+    userId: +req.params.id
+  }
   const status = req.params.status
   if (status) {
     whereClause = {

@@ -8,7 +8,7 @@ import { UnauthorizedException } from "../exceptions/unauthorized.ts";
 
 export const addItemToCart = async (req: Request, res: Response) => {
     console.log("Authorization Header:", req.headers.authorization);
-console.log("User after decode:", req.user);
+    console.log("User after decode:", req.user);
     if (!req.user) {
         throw new UnauthorizedException("User not authenticated", ErrorCode.UNAUTHORIZED);
     }
@@ -34,20 +34,19 @@ console.log("User after decode:", req.user);
     })
     res.json(cart)
 }
-
 export const deleteItemFromCart = async (req: Request, res: Response) => {
-  try {
-    const cartId = +req.params.id;
-    const deletedItem = await prisma.cartItem.delete({
-      where: {
-        id: cartId,
-      },
-    });
-    res.json({ success: true, id: deletedItem.id });
-  } catch (error: any) {
-    console.error("❌ Error deleting cart item:", error);
-    res.status(500).json({ success: false, message: "Failed to delete cart item" });
-  }
+    try {
+        const cartId = +req.params.id;
+        const deletedItem = await prisma.cartItem.delete({
+            where: {
+                id: cartId,
+            },
+        });
+        res.json({ success: true, id: deletedItem.id });
+    } catch (error: any) {
+        console.error(" Error deleting cart item:", error);
+        res.status(500).json({ success: false, message: "Failed to delete cart item" });
+    }
 };
 
 export const changeQuantity = async (req: Request, res: Response) => {

@@ -21,103 +21,107 @@ enum OrderEventStatus {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  fullName String?
-  username String? @unique
-  email String @unique
-  password String
-  gender String?
-  profilePhoto String?
-  role Role @default(USER)
+  id                     Int            @id @default(autoincrement())
+  fullName               String?
+  username               String?        @unique
+  email                  String         @unique
+  password               String
+  gender                 String?
+  profilePhoto           String?
+  role                   Role           @default(USER)
   defaultShippingAddress Int?
-  defaultBillingAddress Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  addresses Address[]
-  cartItems CartItem[]
-  orders Order[]
+  defaultBillingAddress  Int?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  addresses              Address[]
+  cartItems              CartItem[]
+  orders                 Order[]
+  WishlistItem           WishlistItem[]
+
   @@map("users")
 }
 
 model Address {
-  id Int @id @default(autoincrement())
-  lineOne String
-  lineTwo String?
-  city String
-  country String
-  pincode String
-  userId Int
-  user User @relation(fields : [userId],references: [id])
+  id        Int      @id @default(autoincrement())
+  lineOne   String
+  lineTwo   String?
+  city      String
+  country   String
+  pincode   String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@map("addresses")
 }
 
 model Product {
-  id Int @id @default(autoincrement())
-  name String
-  description String
-  price Decimal
+  id            Int            @id @default(autoincrement())
+  name          String
+  description   String
+  price         Decimal
   discountPrice Decimal?
-  stock Int @default(0)
-  image String?
-  category String @default("Uncategorized")
-  isAvailable Boolean   @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  cartItems CartItem[]
-  orders OrderProduct[]
+  stock         Int            @default(0)
+  image         String?
+  category      String         @default("Uncategorized")
+  isAvailable   Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  cartItems     CartItem[]
+  orders        OrderProduct[]
+  WishlistItem  WishlistItem[]
+
   @@map("products")
 }
 
-
 model CartItem {
-  id Int @id @default(autoincrement())
-  userId Int
-  User User @relation(fields : [userId],references: [id])
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  User      User     @relation(fields: [userId], references: [id])
   productId Int
-  product Product @relation(fields : [productId],references: [id])
-  quantity Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("cart_items")
 }
 
-
 model Order {
-  id Int @id @default(autoincrement())
-  userId Int
-  user User @relation(fields : [userId], references: [id])
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  user      User             @relation(fields: [userId], references: [id])
   netAmount Decimal
-  status OrderEventStatus @default(PENDING)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  products OrderProduct[]
+  status    OrderEventStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  products  OrderProduct[]
+
   @@map("orders")
 }
 
 model OrderProduct {
-  id Int @id @default(autoincrement())
-  orderId Int
-  order Order @relation(fields : [orderId], references: [id])
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id])
   productId Int
-  product Product @relation(fields : [productId], references: [id])
-  quantity Int
-  price Float @default(0)
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@map("orders_products")
 }
 
-// model OrderEvent {
-//   id Int @id @default(autoincrement())
-//   orderId Int
-//   order Order @relation(fields : [orderId], references: [id])
-//   status OrderEventStatus @default(PENDING)
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-//   @@map("order_events")
-// }
+model WishlistItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  @@unique([userId, productId])
+  @@map("wishlist_items")
+}

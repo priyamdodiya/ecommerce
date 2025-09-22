@@ -69,7 +69,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         email: user.email,
         gender: user.gender,
         profilePhoto: user.profilePhoto,
-        role:user.role
+        role: user.role
       },
       token,
     });
@@ -78,6 +78,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-export const me = async (req : Request, res : Response) =>{
-    res.json(req.user)  
+export const me = async (req: Request, res: Response) => {
+  res.json(req.user)
 }
